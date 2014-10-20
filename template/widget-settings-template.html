@@ -1,0 +1,86 @@
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cancel()">&times;</button>
+  <h3>Widget Options <small>{{widget.title}}</small></h3>
+</div>
+
+<div class="modal-body">
+    <form name="form" novalidate class="form-horizontal">
+        <div class="form-group">
+            <label for="widgetTitle" class="col-sm-3 control-label">Title</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" name="widgetTitle" ng-model="result.title">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="widgetSource" class="col-sm-3 control-label">Data Source</label>
+            <div class="col-sm-9">
+                <select name="datasources" data-ng-model="result.datasource" data-ng-change="changeDataSource()">
+                    <option data-ng-repeat="datasource in datasources" value="{{datasource.id}}">{{datasource.value}}</option>
+                </select>
+            </div>
+        </div>
+        <!-- Data Source Settings -->
+         <div class="form-group">
+            <div class="col-sm-9 col-sm-offset-3">
+                <div class="form-group">
+                    <label for="GAAccount" class="col-sm-3 control-label">Account</label>
+                    <div class="col-sm-9">
+                        <select name="accounts" data-ng-model="result.ga.accountid" data-ng-change="ga.changeAccount()">
+                            <option data-ng-repeat="account in result.ga.accounts" value="{{account.id}}">{{account.name}}</option>
+                        </select>
+                    </div>            
+                </div>
+                <div class="form-group">
+                    <label for="GAProperty" class="col-sm-3 control-label">Property</label>
+                    <div class="col-sm-9">
+                        <select name="properties" data-ng-model="result.ga.propertyid" data-ng-change="ga.changeProperty()">
+                            <option data-ng-repeat="property in result.ga.properties" value="{{property.id}}">{{property.name}}</option>
+                        </select>
+                    </div>            
+                </div>       
+                <div class="form-group">
+                    <label for="GAProfile" class="col-sm-3 control-label">Profile</label>
+                    <div class="col-sm-9">
+                        <select name="profiles" data-ng-model="result.ga.profileid">
+                            <option data-ng-repeat="profile in result.ga.profiles" value="{{profile.id}}">{{profile.name}}</option>
+                        </select>
+                    </div>            
+                </div>   
+                <div class="form-group">
+                    <label for="GAProfile" class="col-sm-3 control-label">Dimensions</label>
+                    <div class="col-sm-9">
+                        <!-- <select name="dimensions" data-ng-model="result.ga.dimensionid">
+                        </select> --->
+                        <div ng-dropdown-multiselect="" options="result.ga.dimData" selected-model="result.ga.dimModel" extra-settings="result.ga.dimSettings"></div>
+                    </div>
+                </div>   
+                <div class="form-group">
+                    <label for="GAProfile" class="col-sm-3 control-label">Metrics</label>
+                    <div class="col-sm-9">
+                        <div ng-dropdown-multiselect="" options="result.ga.metData" selected-model="result.ga.metModel" extra-settings="result.ga.metSettings"></div>
+                    </div>            
+                </div>   
+                <div class="form-group">
+                    <label for="GAStartDate" class="col-sm-3 control-label">Start Date</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="enddate" data-ng-model="result.ga.startdate" value="2014-10-10"/>
+                    </div>            
+                </div>   
+                <div class="form-group">
+                    <label for="GAEndDate" class="col-sm-3 control-label">End Date</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="enddate" data-ng-model="result.ga.enddate" value="2014-10-10"/>
+                    </div>            
+                </div>              
+            </div>
+        </div>       
+        <div ng-if="widget.settingsModalOptions.partialTemplateUrl"
+             ng-include="widget.settingsModalOptions.partialTemplateUrl"></div>
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button type="button" class="btn btn-primary" ng-click="ok()">OK</button>
+</div>
+<script src="https://apis.google.com/js/client.js?onload=handleClientLoad"></script>

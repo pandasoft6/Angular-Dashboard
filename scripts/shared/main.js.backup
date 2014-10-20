@@ -1,0 +1,138 @@
+(function() {
+  'use strict';
+  angular.module('app.controllers', []).controller('AppCtrl', [
+    '$scope', '$location', '$window', '$http', function($scope, $location, $window, $http) {
+      $scope.apiKey = "AIzaSyCIjTshdBPDBrZQdeFggnn1z85rue2ItTk";
+      $scope.clientId = '297641329485-45rfdicrb99rkammjhjeu84bprsf8d1o.apps.googleusercontent.com';
+      $scope.scopes = ["https://www.googleapis.com/auth/analytics.readonly", "https://www.googleapis.com/auth/userinfo.email"];
+	  //$scope.test = "TEST";
+	  $scope.url = "https://www.googleapis.com/analytics/v3/metadata/ga/columns?key=AIzaSyCIjTshdBPDBrZQdeFggnn1z85rue2ItTk";
+		$http.get($scope.url)
+		   .then(function(result) {
+				//resolve the promise as the data
+				var items = result.data.items;
+				var dimensions = [];
+				var metrics = [];
+				for(var index in items){
+					var item = items[index];
+					if(item.attributes.type=="DIMENSION"){
+						dimensions.push(item.id);
+					}
+					if(item.attributes.type=="METRIC"){
+						metrics.push(item.id);
+					}
+				}
+				$scope.dimensions = dimensions;
+				$scope.metrics = metrics;
+				$scope.$apply();
+			});
+      $window.init = function() {
+        gapi.client.setApiKey($scope.apiKey);
+        window.setTimeout($scope.checkAuth, 1);
+      };
+      $scope.checkAuth = function() {
+        gapi.auth.authorize({
+          client_id: $scope.clientId,
+          scope: $scope.scopes,
+          immediate: true
+        }, $scope.handleAuthResult);
+      };
+      $scope.handleAuthResult = function(authResult) {
+        if (authResult && !authResult.error) {
+			$scope.authorized = 1;
+			gapi.client.load("analytics", "v3", function(a) {
+				gapi.client.analytics.management.accounts.list().execute($scope.handleAccounts);
+			})
+        } else {
+          $scope.handleUnauthorized;
+        }
+      };
+      $scope.handleUnauthorized = function() {
+        return $scope.authorized = 0;
+      };
+      $scope.handleAuthClick = function() {
+        gapi.auth.authorize({
+          client_id: $scope.clientId,
+          scope: $scope.scopes,
+          immediate: false
+        }, $scope.handleAuthResult);
+        return false;
+      };
+	  $scope.handleAccounts = function(a){
+			if (a.error) console.log("Error while loading accounts");
+			else if (a.items && a.items.length) {
+				$scope.accounts = a.items;
+				$scope.$apply();
+			} else console.log("No Account")
+	  };
+	  $scope.handleAccountClick = function(accountid){
+		 gapi.client.analytics.management.webproperties.list({
+			accountId: accountid
+		}).execute($scope.handleWebproperties)
+	  };
+	  $scope.handleWebproperties = function(a){
+		if (a.error) console.log("Error while loading properties")
+		else if (a.items && a.items.length) {
+			$scope.properties = a.items;
+			$scope.$apply();
+		}else console.log("No web properties found")
+	  };
+	  $scope.handlePropertyClick = function(accountid, propertyid){
+		gapi.client.analytics.management.profiles.list({
+			accountId: accountid,
+			webPropertyId: propertyid
+		}).execute($scope.handleProfiles);
+	  };
+	  $scope.handleProfiles = function(a){
+		 if (a.error) console.log(a);
+		else if (a.items && a.items.length) {
+			$scope.profiles = a.items;
+			$scope.$apply();
+		} else console.log("No views (profiles) found")
+	  };
+	  $scope.loadanalytics = function(profileid, dimension, metric, startdate, enddate){
+		 var apiQuery = gapi.client.analytics.data.ga.get({
+			'ids': 'ga:' + profileid,
+			'start-date': startdate,
+			'end-date': enddate,
+			'metrics': metric,
+			'dimensions': dimension,
+			'max-results': 25
+		  });
+		apiQuery.execute($scope.handleCoreReportingResults);
+	  };
+	  $scope.handleCoreReportingResults = function(results){
+		$scope.analyticresults = results.rows;
+		$scope.$apply();
+	  };
+      $scope.isSpecificPage = function() {
+        var path;
+        path = $location.path();
+        return _.contains(['/404', '/pages/500', '/pages/login', '/pages/signin', '/pages/signin1', '/pages/signin2', '/pages/signup', '/pages/signup1', '/pages/signup2', '/pages/lock-screen'], path);
+      };
+      return $scope.main = {
+        brand: 'Flatify',
+        name: 'Lisa Doe'
+      };
+    }
+  ]).controller('NavCtrl', [
+    '$scope', 'taskStorage', 'filterFilter', function($scope, taskStorage, filterFilter) {
+      var tasks;
+      tasks = $scope.tasks = taskStorage.get();
+      $scope.taskRemainingCount = filterFilter(tasks, {
+        completed: false
+      }).length;
+      return $scope.$on('taskRemaining:changed', function(event, count) {
+        return $scope.taskRemainingCount = count;
+      });
+    }
+  ]).controller('DashboardCtrl', [
+    '$scope', function($scope) {
+      $scope.comboChartData = [['Month', 'Bolivia', 'Ecuador', 'Madagascar', 'Papua New Guinea', 'Rwanda', 'Average'], ['2014/05', 165, 938, 522, 998, 450, 614.6], ['2014/06', 135, 1120, 599, 1268, 288, 682], ['2014/07', 157, 1167, 587, 807, 397, 623], ['2014/08', 139, 1110, 615, 968, 215, 609.4], ['2014/09', 136, 691, 629, 1026, 366, 569.6]];
+      return $scope.salesData = [['Year', 'Sales', 'Expenses'], ['2010', 1000, 400], ['2011', 1170, 460], ['2012', 660, 1120], ['2013', 1030, 540]];
+    }
+  ]);
+
+}).call(this);
+
+//# sourceMappingURL=main.js.map

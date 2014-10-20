@@ -1,0 +1,137 @@
+
+<div class="page page-table" data-ng-controller="tableCtrl">
+
+    <section class="panel panel-default table-dynamic">
+        <div class="panel-heading"><strong><span class="glyphicon glyphicon-th"></span> Google Analytics Data</strong></div>
+        <div class="table-filters">
+            <div class="row">
+                <div class="col-sm-4 col-xs-6">
+                    <form>
+                       <div data-ng-hide="authorized">
+                          <button id="authorize-button" data-ng-click="handleAuthClick()">Authorize</button>
+						<input type="button" data-ng-click="testclick()">Test</input>
+						<input type="text" data-ng-model="test"/>
+						<div class="input-group ui-datepicker">
+							<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+							<input type="text" 
+								   class="form-control"
+								   datepicker-popup="{{format}}"
+								   ng-model="dt1"
+								   is-open="opened"
+								   min="minDate"
+								   max="'2015-06-22'"
+								   datepicker-options="dateOptions" 
+								   date-disabled="disabled(date, mode)"
+								   ng-required="true" 
+								   close-text="Close">
+						</div>
+                    </div>
+                       </div>
+					   <div data-ng-show="authorized">
+							<div class="row">
+								<label class="col-sm-3 col-xs-3">Account</label>
+								<select name="accounts" data-ng-model="accountid" data-ng-change="handleAccountClick(accountid)">
+									<option data-ng-repeat="account in accounts" value="{{account.id}}">{{account.name}}</option>
+								</select>
+							</div>
+							<div class="row">
+								<label class="col-sm-3 col-xs-3">Property</label>
+								<select name="properties" data-ng-model="propertyid" data-ng-change="handlePropertyClick(accountid, propertyid)">
+									<option data-ng-repeat="property in properties" value="{{property.id}}">{{property.name}}</option>
+								</select>
+							</div>				
+							<div class="row">
+								<label class="col-sm-3 col-xs-3">View(Profile)</label>
+								<select name="profiles" data-ng-model="profileid" >
+									<option data-ng-repeat="profile in profiles" value="{{profile.id}}">{{profile.name}}</option>
+								</select>
+							</div>		
+							<hr>
+							<div class="row">
+								<label class="col-sm-3 col-xs-3">Dimension</label>
+							   <select name="dimensions" data-ng-model="dimensionid">
+									<option data-ng-repeat="dimension in dimensions">{{dimension}}</option>
+								</select>
+							</div>								
+							<div class="row">
+								<label class="col-sm-3 col-xs-3">Metric</label>
+							   <select name="metrics" data-ng-model="metricid">
+									<option data-ng-repeat="metric in metrics">{{metric}}</option>
+								</select>	
+							</div>		
+							<div class="row">
+								<label class="col-sm-3 col-xs-3">Start Date</label>
+							</div>									
+							<div class="row">
+								<label class="col-sm-3 col-xs-3">End Date</label>
+							   <input type="text" name="enddate" data-ng-model="enddate" value=""/>
+							</div>																
+							<div class="row">
+								<label class="col-sm-3 col-xs-3"></label>
+								<input type="button" value="Load Analytics Data" data-ng-click="loadanalytics(profileid, dimensionid, metricid, startdate, enddate)">
+							</div>
+					   </div>					
+
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <table class="table table-bordered table-striped table-responsive">
+            <thead>
+                <tr>
+                    <th><div class="th">
+                        {{dimensionid}}
+                        <span class="glyphicon glyphicon-chevron-up"
+                              data-ng-click=" order('name') "
+                              data-ng-class="{active: row == 'name'}"></span>
+                        <span class="glyphicon glyphicon-chevron-down"
+                              data-ng-click=" order('-name') "
+                              data-ng-class="{active: row == '-name'}"></span>
+                    </div></th>
+                    <th><div class="th">
+                        {{metricid}}
+                        <span class="glyphicon glyphicon-chevron-up"
+                              data-ng-click=" order('price') "
+                              data-ng-class="{active: row == 'price'}"></span>
+                        <span class="glyphicon glyphicon-chevron-down"
+                              data-ng-click=" order('-price') "
+                              data-ng-class="{active: row == '-price'}"></span>
+                    </div></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-ng-repeat="row in analyticresults">
+                    <td>{{row[0]}}</td>
+                    <td>{{row[1]}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <footer class="table-footer">
+            <div class="row">
+                <div class="col-md-6 page-num-info">
+                    <span>
+                        Show 
+                        <select data-ng-model="numPerPage"
+                                data-ng-options="num for num in numPerPageOpt"
+                                data-ng-change="onNumPerPageChange()">
+                        </select> 
+                        entries per page
+                    </span>
+                </div>
+                <div class="col-md-6 text-right pagination-container">
+                    <pagination class="pagination-sm"
+                                page="currentPage"
+                                total-items="filteredStores.length"
+                                max-size="4"
+                                on-select-page="select(page)"
+                                items-per-page="numPerPage"
+                                rotate="false"
+                                boundary-links="true"></pagination>
+                </div>
+            </div>
+        </footer>
+    </section>
+
+</div>
